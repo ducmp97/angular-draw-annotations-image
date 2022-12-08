@@ -1,0 +1,1 @@
+# angular-draw-annotations-image
