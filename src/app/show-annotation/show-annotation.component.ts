@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as markerjs2 from 'markerjs2';
 import { MarkerService } from '../event-bus/marker.service';
+import { ExportImageService } from '../service/export-image.service';
 
 @Component({
   selector: 'app-show-annotation',
@@ -8,7 +9,12 @@ import { MarkerService } from '../event-bus/marker.service';
   styleUrls: ['./show-annotation.component.scss'],
 })
 export class ShowAnnotationComponent implements OnInit {
-  constructor(private markerService: MarkerService) {}
+  imageUrl: any;
+
+  constructor(
+    private markerService: MarkerService,
+    private exportService: ExportImageService
+  ) {}
 
   ngOnInit(): void {
     let sampleImage: any = document.getElementById('show-image');
@@ -35,10 +41,46 @@ export class ShowAnnotationComponent implements OnInit {
 
       markerArea.addEventListener('render', (event) => {
         target.src = event.dataUrl;
+        this.imageUrl = event.dataUrl;
       });
       markerArea.show();
       markerArea.restoreState(marker);
       markerArea.startRenderAndClose();
     }
+  }
+
+  exportImage() {
+    const imageName = 'name.png';
+    const a = this.getFileFromBase64(this.imageUrl, imageName);
+    console.log('a:', a);
+  }
+
+  getFileFromBase64(string64: string, fileName: string) {
+    const trimmedString = string64.replace('data:image/png;base64,', '');
+    const imageContent = window.atob(trimmedString);
+    const buffer = new ArrayBuffer(imageContent.length);
+    const view = new Uint8Array(buffer);
+
+    for (let n = 0; n < imageContent.length; n++) {
+      view[n] = imageContent.charCodeAt(n);
+    }
+    const type = 'image/png';
+    const blob = new Blob([buffer], { type });
+    //download image
+    this.downloadImage(blob, fileName);
+
+    return new File([blob], fileName, {
+      lastModified: new Date().getTime(),
+      type,
+    });
+  }
+
+  downloadImage(blob: Blob, fileName: string) {
+    let a = document.createElement('a');
+    let url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 }

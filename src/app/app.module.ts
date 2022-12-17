@@ -6,19 +6,17 @@ import { AppComponent } from './app.component';
 import { DrawAnnotationComponent } from './draw-annotation/draw-annotation.component';
 import { CreateAnnotationComponent } from './create-annotation/create-annotation.component';
 import { ShowAnnotationComponent } from './show-annotation/show-annotation.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
     AppComponent,
     DrawAnnotationComponent,
     CreateAnnotationComponent,
-    ShowAnnotationComponent
+    ShowAnnotationComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
