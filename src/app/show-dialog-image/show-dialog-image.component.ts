@@ -14,7 +14,7 @@ import htmlToPdfmake from 'html-to-pdfmake';
 import domtoimage from 'dom-to-image';
 import { MarkerService } from '../event-bus/marker.service';
 import * as markerjs2 from 'markerjs2';
-import { CustomTableLayout } from 'pdfmake/interfaces';
+import { CustomTableLayout, TDocumentDefinitions } from 'pdfmake/interfaces';
 @Component({
   selector: 'app-show-dialog-image',
   templateUrl: './show-dialog-image.component.html',
@@ -22,7 +22,13 @@ import { CustomTableLayout } from 'pdfmake/interfaces';
 })
 export class ShowDialogImageComponent implements OnInit {
   @ViewChild('content') pdfContent: ElementRef | undefined;
+  @ViewChild('image') pdfImage: ElementRef | undefined;
+  @ViewChild('header') pdfHeader: ElementRef | undefined;
 
+  htmlContent: any;
+  htmlImage: any;
+  htmlHeader: any;
+  imageBase64: string | undefined;
   constructor(
     public dialogRef: MatDialogRef<ShowDialogImageComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -68,29 +74,52 @@ export class ShowDialogImageComponent implements OnInit {
 
   convertToPdf() {
     const doc = new jsPDF();
+    const fileName = new Date().getTime();
 
-    let date = new Date().getTime();
-
+    if (this.pdfHeader) {
+      const pdfHeader = this.pdfHeader.nativeElement;
+      this.htmlHeader = htmlToPdfmake(pdfHeader.innerHTML, {
+        tableAutoSize: true,
+      });
+    }
     if (this.pdfContent) {
       const pdfContent = this.pdfContent.nativeElement;
-      var html = htmlToPdfmake(pdfContent.innerHTML);
-      const documentDefinition = {
-        content: html,
-        info: {
-          title: 'Country Profile',
-          author: 'UNESCAP Statistics Division',
-        },
-        footer: function (currentPage: any, pageCount: any) {
-          return currentPage.toString() + ' of ' + pageCount;
-        },
-      };
-      const file = pdfMake.createPdf(documentDefinition);
-
-      console.log('file: ', file);
-      // console.log('file blod: ', file.getBlob());
-
-      // file.download('' + date);
-      file.open();
+      this.htmlContent = htmlToPdfmake(pdfContent.innerHTML, {
+        tableAutoSize: true,
+      });
     }
+
+    if (this.pdfImage) {
+      const pdfImage = this.pdfImage.nativeElement;
+      this.htmlImage = htmlToPdfmake(pdfImage.innerHTML);
+    }
+
+    const documentDefinition: TDocumentDefinitions = {
+      pageSize: 'A4',
+      content: [
+        ...this.htmlHeader,
+        {
+          image: this.data.imageUrl,
+          width: 100,
+          height: 100,
+        },
+        ...this.htmlContent,
+      ],
+      info: {
+        title: 'Checksheet Report',
+        author: 'DucMp97',
+        creationDate: new Date(),
+        subject: 'Checksheet',
+      },
+
+      images: {
+        avatar: {
+          url: this.htmlImage[0].image,
+        },
+      },
+    };
+    const file = pdfMake.createPdf(documentDefinition);
+    // file.download(`${fileName}.pdf`);
+    file.open();
   }
 }
