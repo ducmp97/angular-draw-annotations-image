@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import * as markerjs2 from 'markerjs2';
 import { MarkerService } from '../event-bus/marker.service';
 import { ExportImageService } from '../service/export-image.service';
+import { ShowDialogImageComponent } from '../show-dialog-image/show-dialog-image.component';
 
 @Component({
   selector: 'app-show-annotation',
@@ -13,7 +15,8 @@ export class ShowAnnotationComponent implements OnInit {
 
   constructor(
     private markerService: MarkerService,
-    private exportService: ExportImageService
+    private exportService: ExportImageService,
+    private dialog: MatDialog // private dialogRef: MatDialogRef<ShowDialogImageComponent, any>
   ) {}
 
   ngOnInit(): void {
@@ -82,5 +85,19 @@ export class ShowAnnotationComponent implements OnInit {
     a.download = fileName;
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  showImage() {
+    const dialogRef = this.dialog.open(ShowDialogImageComponent, {
+      data: {
+        imageUrl: this.imageUrl,
+      },
+      width: '50vw',
+      panelClass: 'full-panel',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 }
