@@ -7,14 +7,13 @@ import {
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
+import htmlToPdfmake from 'html-to-pdfmake';
 import jsPDF from 'jspdf';
+import * as markerjs2 from 'markerjs2';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import htmlToPdfmake from 'html-to-pdfmake';
-import domtoimage from 'dom-to-image';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { MarkerService } from '../event-bus/marker.service';
-import * as markerjs2 from 'markerjs2';
-import { CustomTableLayout, TDocumentDefinitions } from 'pdfmake/interfaces';
 @Component({
   selector: 'app-show-dialog-image',
   templateUrl: './show-dialog-image.component.html',
@@ -38,16 +37,14 @@ export class ShowDialogImageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // let sampleImage: any = document.getElementById('show-image-dialog');
-    // this.markerService.marker$.subscribe((marker) => {
-    //   console.log('marker', marker);
-    //   if (marker) {
-    //     // sampleImage.src = '../../assets/image.jpg';
-    //     if (sampleImage) {
-    //       this.resetmarketArea(sampleImage, marker);
-    //     }
-    //   }
-    // });
+    let sampleImage: any = document.getElementById('show-image-dialog');
+    this.markerService.marker$.subscribe((marker) => {
+      if (marker) {
+        if (sampleImage) {
+          this.resetmarketArea(sampleImage, marker);
+        }
+      }
+    });
   }
 
   resetmarketArea(target: any, marker: any) {
@@ -62,8 +59,6 @@ export class ShowDialogImageComponent implements OnInit {
       markerArea.settings.disableRotation = true;
 
       markerArea.addEventListener('render', (event) => {
-        console.log('event: ', event.state);
-
         target.src = event.dataUrl;
       });
       markerArea.show();
@@ -82,6 +77,7 @@ export class ShowDialogImageComponent implements OnInit {
         tableAutoSize: true,
       });
     }
+
     if (this.pdfContent) {
       const pdfContent = this.pdfContent.nativeElement;
       this.htmlContent = htmlToPdfmake(pdfContent.innerHTML, {
@@ -99,7 +95,7 @@ export class ShowDialogImageComponent implements OnInit {
       content: [
         ...this.htmlHeader,
         {
-          image: this.data.imageUrl,
+          image: this.htmlImage[0].image,
           width: 100,
           height: 100,
         },
