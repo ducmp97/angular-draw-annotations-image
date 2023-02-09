@@ -29,7 +29,7 @@ export class CreateAnnotationComponent implements OnInit {
   clickButtonEdit() {
     let sampleImage: any = document.getElementById('create');
     //reset url image
-    sampleImage.src = '../../assets/image.jpg';
+    sampleImage.src = '../../assets/image.PNG';
     if (sampleImage) {
       this.resetmarketArea(sampleImage);
     }
@@ -55,6 +55,9 @@ export class CreateAnnotationComponent implements OnInit {
     this.markerArea.addEventListener('render', (event: any) => {
       target.src = event.dataUrl;
       this.markerService.createMarker(event.state);
+      console.log('state: ', event.state);
+      console.log('state string: ', JSON.stringify(event.state));
+
       this.marker = event.state;
     });
     this.markerArea.show();

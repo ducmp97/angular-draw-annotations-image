@@ -40,6 +40,8 @@ export class ShowDialogImageComponent implements OnInit {
     let sampleImage: any = document.getElementById('show-image-dialog');
     this.markerService.marker$.subscribe((marker) => {
       if (marker) {
+        console.log('marker: ', marker);
+
         if (sampleImage) {
           this.resetmarketArea(sampleImage, marker);
         }
@@ -98,6 +100,9 @@ export class ShowDialogImageComponent implements OnInit {
           image: this.htmlImage[0].image,
           width: 100,
           height: 100,
+          pageBreak: 'after',
+          marginBottom: 50,
+          marginTop: 20,
         },
         ...this.htmlContent,
       ],

@@ -23,7 +23,7 @@ export class ShowAnnotationComponent implements OnInit {
     let sampleImage: any = document.getElementById('show-image');
     this.markerService.marker$.subscribe((marker) => {
       if (marker) {
-        sampleImage.src = '../../assets/image.jpg';
+        sampleImage.src = '../../assets/image.PNG';
         if (sampleImage) {
           this.resetmarketArea(sampleImage, marker);
         }
